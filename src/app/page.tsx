@@ -13,20 +13,22 @@ function playRandomSound(frequency: number) {
   oscillator.start();
   setTimeout(() => {
     gain.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.04);
-    // oscillator.stop();
-    // oscillator.disconnect();
+    oscillator.stop();
+    oscillator.disconnect();
   }, 3000);
 }
 
 export default function Home() {
-  const maxFrequency = 2000;
+  const maxFrequency = 493.88;
+  const minFrequency = 261.63;
   const [timesPlayed, setTimesPlayed] = useState(0);
   const [userAnswer, setUserAnswer] = useState(Math.floor(maxFrequency / 2));
-  const [randomFrequency, setRandomFrequency] = useState(0);
+  const [randomFrequency, setRandomFrequency] = useState(
+    Math.floor(Math.random() * (maxFrequency - minFrequency) + minFrequency)
+  );
   const [showAnswer, setShowAnswer] = useState(false);
   const [difference, setDifference] = useState(0);
   useEffect(() => {
-    setRandomFrequency(Math.floor(Math.random() * maxFrequency));
     playRandomSound(randomFrequency);
   }, [timesPlayed]);
 
@@ -53,7 +55,10 @@ export default function Home() {
 
       <button
         className="bg-black text-white p-2 rounded-lg hover:bg-gray-700"
-        onClick={() => setTimesPlayed(timesPlayed + 1)}
+        onClick={() => {
+          setShowAnswer(false);
+          setTimesPlayed(timesPlayed + 1);
+        }}
       >
         Generate Random Sound
       </button>
@@ -62,6 +67,7 @@ export default function Home() {
         id="default-range"
         type="range"
         max={maxFrequency}
+        min={minFrequency}
         onChange={(event) => {
           setUserAnswer(Number(event.target.value));
         }}
@@ -72,7 +78,13 @@ export default function Home() {
         className="bg-black text-white p-2 rounded-lg hover:bg-gray-700"
         onClick={() => {
           setShowAnswer(true);
-          setDifference(randomFrequency - userAnswer);
+          setDifference(Math.floor(randomFrequency - userAnswer));
+
+          setRandomFrequency(
+            Math.floor(
+              Math.random() * (maxFrequency - minFrequency) + minFrequency
+            )
+          );
         }}
       >
         Submit
